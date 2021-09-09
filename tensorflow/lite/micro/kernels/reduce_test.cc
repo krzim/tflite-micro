@@ -586,6 +586,145 @@ TF_LITE_MICRO_TEST(Int8MaxOpTestWithoutKeepDims) {
       tflite::ops::micro::Register_REDUCE_MAX(), &params);
 }
 
+TF_LITE_MICRO_TEST(FloatProdOpTestNotKeepDimsLarge) {
+  int input_shape[] = {3, 4, 3, 2};
+  const float input_data[] = {1.0,  2.0,  3.0,  4.0,  5.0,  6.0,  7.0,  8.0,
+                              9.0,  10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0,
+                              17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0};
+  int axis_shape[] = {1, 4};
+  const int32_t axis_data[] = {1, 0, -3, -3};
+  int output_shape[] = {1, 2};
+  const float expected_output_data[] = {3.162341376e+11, 1.9619905536e+12};
+  float output_data[2];
+
+  TfLiteReducerParams params = {false};
+
+  tflite::testing::TestReduceOpFloat(
+      input_shape, input_data, axis_shape, axis_data, output_shape, output_data,
+      expected_output_data, tflite::Register_REDUCE_PROD(), &params);
+}
+
+TF_LITE_MICRO_TEST(FloatProdOpTestNotKeepDimsSmall) {
+  int input_shape[] = {3, 4, 3, 2};
+  const float input_data[] = {-1.3, -1.2, -1.1, -1.0, -0.9, -0.8, -0.7, -0.6,
+                              -0.5, -0.4, -0.3, -0.2, -0.2, 0.3,  0.4,  0.5,
+                              0.6,  0.7,  0.8,  0.9,  1.0,  1.1,  1.2,  1.3};
+  int axis_shape[] = {1, 4};
+  const int32_t axis_data[] = {1, 0, -3, -3};
+  int output_shape[] = {1, 2};
+  const float expected_output_data[] = {-0.0062270208, 0.0062270208};
+  float output_data[2];
+
+  TfLiteReducerParams params = {false};
+
+  tflite::testing::TestReduceOpFloat(
+      input_shape, input_data, axis_shape, axis_data, output_shape, output_data,
+      expected_output_data,  tflite::Register_REDUCE_PROD(), &params);
+}
+
+TF_LITE_MICRO_TEST(FloatProdOpTestKeepDims) {
+  int input_shape[] = {3, 4, 3, 2};
+  const float input_data[] = {1.0,  2.0,  3.0,  4.0,  5.0,  6.0,  7.0,  8.0,
+                              9.0,  10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0,
+                              17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0};
+  int axis_shape[] = {1, 2};
+  const int32_t axis_data[] = {0, 2};
+  int output_shape[] = {1, 3};
+  const float expected_output_data[] = {7.74592e+06, 1.197504e+08, 6.6889152e+08};
+  float output_data[3];
+
+  TfLiteReducerParams params = {true};
+
+  tflite::testing::TestReduceOpFloat(
+      input_shape, input_data, axis_shape, axis_data, output_shape, output_data,
+      expected_output_data,  tflite::Register_REDUCE_PROD(), &params);
+}
+
+TF_LITE_MICRO_TEST(Int8ProdOpTestNotKeepDimsLarge) {
+  int input_shape[] = {3, 4, 3, 2};
+  const float input_data[] = {1.0,  2.0,  3.0,  4.0,  5.0,  6.0,  7.0,  8.0,
+                              9.0,  10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0,
+                              17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0};
+  int axis_shape[] = {1, 4};
+  const int32_t axis_data[] = {1, 0, -3, -3};
+  int output_shape[] = {1, 2};
+  const float expected_output_data[] = {3.162341376e+11, 1.9619905536e+12};
+
+  float input_scale = 255.0f;
+  int input_zp = 0;
+  float output_scale = 255.0f;
+  int output_zp = 0;
+
+  TfLiteReducerParams params = {false};
+
+  int8_t input_data_quant[6];
+  int8_t output_data_quant[2];
+  int8_t expected_output_data_quant[2];
+
+  tflite::testing::TestReduceOpQuantized<int8_t>(
+      input_shape, input_data, input_data_quant, input_scale, input_zp,
+      axis_shape, axis_data, output_shape, expected_output_data,
+      output_data_quant, expected_output_data_quant, output_scale, output_zp,
+       tflite::Register_REDUCE_PROD(), &params);
+}
+
+TF_LITE_MICRO_TEST(Int8ProdOpTestWithoutKeepDimsSmall) {
+  int input_shape[] = {3, 4, 3, 2};
+  const float input_data[] = {-1.3, -1.2, -1.1, -1.0, -0.9, -0.8, -0.7, -0.6,
+                              -0.5, -0.4, -0.3, -0.2, -0.2, 0.3,  0.4,  0.5,
+                              0.6,  0.7,  0.8,  0.9,  1.0,  1.1,  1.2,  1.3};
+  int axis_shape[] = {1, 4};
+  const int32_t axis_data[] = {1, 0, -3, -3};
+  int output_shape[] = {1, 2};
+  const float expected_output_data[] = {-0.0062270208, 0.0062270208};
+
+  float input_scale = 255.0f;
+  int input_zp = 0;
+  float output_scale = 255.0f;
+  int output_zp = 0;
+
+  TfLiteReducerParams params = {false};
+
+  int8_t input_data_quant[6];
+  int8_t output_data_quant[2];
+  int8_t expected_output_data_quant[2];
+
+  tflite::testing::TestReduceOpQuantized<int8_t>(
+      input_shape, input_data, input_data_quant, input_scale, input_zp,
+      axis_shape, axis_data, output_shape, expected_output_data,
+      output_data_quant, expected_output_data_quant, output_scale, output_zp,
+       tflite::Register_REDUCE_PROD(), &params);
+}
+
+TF_LITE_MICRO_TEST(Int8ProdOpTestKeepDims) {
+  int input_shape[] = {3, 4, 3, 2};
+  const float input_data[] = {1.0,  2.0,  3.0,  4.0,  5.0,  6.0,  7.0,  8.0,
+                              9.0,  10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0,
+                              17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0};
+  int axis_shape[] = {1, 2};
+  const int32_t axis_data[] = {0, 2};
+  int output_shape[] = {1, 3};
+  const float expected_output_data[] = {7.74592e+06, 1.197504e+08, 6.6889152e+08};
+
+  float input_scale = 255.0f;
+  int input_zp = 0;
+  float output_scale = 255.0f;
+  int output_zp = 0;
+
+  TfLiteReducerParams params = {false};
+
+  int8_t input_data_quant[6];
+  int8_t output_data_quant[3];
+  int8_t expected_output_data_quant[3];
+
+  tflite::testing::TestReduceOpQuantized<int8_t>(
+      input_shape, input_data, input_data_quant, input_scale, input_zp,
+      axis_shape, axis_data, output_shape, expected_output_data,
+      output_data_quant, expected_output_data_quant, output_scale, output_zp,
+       tflite::Register_REDUCE_PROD(), &params);
+}
+
+
 TF_LITE_MICRO_TEST(MeanInt84DWithoutKeepDimsWithPrecision) {
   int kInputShape4D[] = {4, 2, 2, 3, 1};
   const float kInputData4D[] = {1.0,  24.0, 13.0, 3.0,  9.0,  17.0,
