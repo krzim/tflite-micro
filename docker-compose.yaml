@@ -1,0 +1,4 @@
+services:
+  tflite-micro:
+    build:
+      context: .
