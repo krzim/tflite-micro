@@ -1,0 +1,6 @@
+version: "3.7"
+services:
+  tflite-micro:
+    build:
+      context: .
+      target: development #tflm-ci:x86_tests
