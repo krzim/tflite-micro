@@ -50,3 +50,6 @@ RUN /install/install_buildifier.sh
 # COPY ./ /app/
 # CMD /app/tensorflow/lite/micro/tools/ci_build/test_makefile.sh && \
 #     /app/tensorflow/lite/micro/tools/ci_build/test_x86.sh
+
+# hack to keep the container running for development
+CMD tail -f /dev/null
